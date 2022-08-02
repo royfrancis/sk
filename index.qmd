@@ -1,0 +1,36 @@
+---
+title: "Mortgage Interest Rates"
+subtitle: "Skandia Bank"
+format: 
+  html:
+    page-layout: full
+    self-contained: true
+    theme: flatly
+---
+
+```{r,include=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readxl)
+library(highcharter)
+
+s <- readxl::read_xlsx("skandia-interest.xlsx") %>%
+      setNames(c("year","month","6 months", "1 year", "2 years", "3 years", "5 years")) %>%
+      tidyr::pivot_longer(`6 months`:`5 years`, names_to = "period", values_to = "value") %>%
+      mutate(date=lubridate::as_date(paste0("01-",month,"-",year),format="%d-%b-%Y")) %>%
+      arrange(period,date)
+```
+
+```{r,echo=FALSE}
+hchart(s,"line",hcaes(x=date,y=value,group=period)) %>%
+  hc_xAxis(title=list(text="Date"),crosshair=TRUE) %>%
+  hc_yAxis(title=list(text="Interest rate %"),crosshair=TRUE) %>%
+  hc_chart(zoomType="xy") %>%
+  hc_plotOptions(scatter=list(marker=list(radius=3),opacity=0.8)) %>%
+  hc_legend(enabled=TRUE,verticalAlign="top",align="right") %>%
+  hc_size(height=600) %>%
+  #hc_title(text=title,align="left") %>%
+  hc_exporting(buttons=list(contextButton=list(enabled=TRUE)))
+```
+
