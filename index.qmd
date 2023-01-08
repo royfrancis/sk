@@ -10,8 +10,9 @@ format:
 
 ```{r,include=FALSE}
 library(lubridate)
+library(xts)
 library(readxl)
-library(highcharter)
+library(dygraphs)
 library(ggplot2)
 library(tidyr)
 library(dplyr)
@@ -63,13 +64,14 @@ s3 <- s %>%
   ungroup()
 
 s4 <- s1 %>%
+  select(date,slope_5) %>%
   inner_join(select(s2,date,slope_3),by="date") %>%
-  inner_join(select(s3,date,slope_2),by="date") %>%
-  tidyr::pivot_longer(c(slope_5,slope_3,slope_2), names_to = "period", values_to = "value") %>%
-  arrange(date)
+  inner_join(select(s3,date,slope_2),by="date")
+  #tidyr::pivot_longer(c(slope_5,slope_3,slope_2), names_to = "period", values_to = "value") %>%
+  #arrange(date)
 ```
 
-```{r,echo=FALSE}
+```{r,echo=FALSE,eval=FALSE}
 hchart(s,"line",hcaes(x=date,y=value,group=label)) %>%
   hc_xAxis(title=list(text="Date"),crosshair=TRUE) %>%
   hc_yAxis(title=list(text="Interest rate %"),crosshair=TRUE) %>%
@@ -81,9 +83,23 @@ hchart(s,"line",hcaes(x=date,y=value,group=label)) %>%
   hc_exporting(buttons=list(contextButton=list(enabled=TRUE)))
 ```
 
+```{r,echo=FALSE}
+s %>%
+  select(date,label,value) %>%
+  pivot_wider(names_from="label",values_from="value") %>%
+  tibble::column_to_rownames("date") %>%
+  as.xts() %>%
+  dygraph() %>%
+  dyRangeSelector() %>%
+  dyEvent("2022-02-24", "Russian invasion", labelLoc = "bottom") %>%
+  dyEvent("2020-01-30", "Covid outbreak, Brexit", labelLoc = "bottom") %>%
+  dyEvent("2020-12-08", "Covid vaccine", labelLoc = "bottom") %>%
+  dyAxis("y", label = "Interest rate %")
+```
+
 Skandia interest rates for home loan over time. Different colours denotes different periods of fixed rates (6 months, 1 year, 2 years, 3 years, 5 years).
 
-```{r,echo=FALSE}
+```{r,echo=FALSE,eval=FALSE}
 hchart(s4,"line",hcaes(x=date,y=value,group=period)) %>%
   hc_xAxis(title=list(text="Date"),crosshair=TRUE) %>%
   hc_yAxis(title=list(text="Slope"),crosshair=TRUE) %>%
@@ -95,5 +111,20 @@ hchart(s4,"line",hcaes(x=date,y=value,group=period)) %>%
   hc_exporting(buttons=list(contextButton=list(enabled=TRUE)))
 ```
 
+```{r,echo=FALSE}
+s4 %>%
+  tibble::column_to_rownames("date") %>%
+  as.xts() %>%
+  dygraph() %>%
+  dyRangeSelector() %>%
+  dyEvent("2022-02-24", "Russian invasion", labelLoc = "bottom") %>%
+  dyEvent("2020-01-30", "Covid outbreak, Brexit", labelLoc = "bottom") %>%
+  dyEvent("2020-12-08", "Covid vaccine", labelLoc = "bottom") %>%
+  dyAxis("y", label = "Slope")
+```
+
 Slope of fixed interest rates per month. Slope is computed over 0.5 - 2 years, 0.5 - 3 years or 0.5 - 5 years.
+
+
+
 
