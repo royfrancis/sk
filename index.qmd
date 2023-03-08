@@ -1,6 +1,10 @@
 ---
 title: "Mortgage Interest Rates"
 subtitle: "Skandia Bank"
+author: "Roy Francis"
+date: last-modified
+date-format: "DD-MMM-YYYY"
+title-block-banner: true
 format: 
   html:
     page-layout: full
