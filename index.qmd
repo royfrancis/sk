@@ -9,7 +9,7 @@ format:
   html:
     page-layout: full
     self-contained: true
-    theme: flatly
+    theme: minty
 ---
 
 ```{r,include=FALSE}
@@ -20,7 +20,7 @@ library(ggplot2)
 library(tidyr)
 library(dplyr)
 
-key_a <- c(y0.5 = "6 months", y1 = "1 year", y2 = "2 years", y3 = "3 years", y5 = "5 years")
+key_a <- c(y0.5 = "0.5 year", y1 = "1 year", y2 = "2 years", y3 = "3 years", y5 = "5 years")
 key_b <- c(y0.5 = 1, y1 = 2, y2 = 3, y3 = 4, y5 = 5)
 
 s <- readxl::read_xlsx("skandia-interest.xlsx") %>%
@@ -100,4 +100,8 @@ hchart(s4,"line",hcaes(x=date,y=value,group=period)) %>%
 ```
 
 Slope of fixed interest rates per month. Slope is computed over 0.5 - 2 years, 0.5 - 3 years or 0.5 - 5 years.
+
+---
+
+[Source: Skandia](https://www.skandia.se/lana/bolan/bolanerantor/snittrantor/)
 
