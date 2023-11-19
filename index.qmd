@@ -103,6 +103,7 @@ hchart(s4,"line",hcaes(x=date,y=value,group=period)) %>%
   hc_legend(enabled=TRUE,verticalAlign="top",align="right") %>%
   hc_size(height=400) %>%
   #hc_title(text=title,align="left") %>%
+  hc_colors(c("#CA527D", "#8A81CA", "#70D451")) %>%
   hc_exporting(buttons=list(contextButton=list(enabled=TRUE)))
 ```
 
