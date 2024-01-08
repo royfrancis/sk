@@ -9,7 +9,7 @@ format:
   html:
     page-layout: full
     self-contained: true
-    theme: minty
+    theme: lux
 ---
 
 ```{r,include=FALSE}
