@@ -19,12 +19,12 @@ library(highcharter)
 library(tidyr)
 library(dplyr)
 
-key_a <- c(y0.5 = "0.5 year", y1 = "1 year", y2 = "2 years", y3 = "3 years", y5 = "5 years")
+key_a <- c(y0.5 = "3 months", y1 = "1 year", y2 = "2 years", y3 = "3 years", y5 = "5 years")
 key_b <- c(y0.5 = 1, y1 = 2, y2 = 3, y3 = 4, y5 = 5)
 
 s <- readxl::read_xlsx("skandia-interest.xlsx") %>%
       tidyr::pivot_longer(`y0.5`:`y5`, names_to = "period", values_to = "value") %>%
-      mutate(label=recode(period, !!!key_a)) %>%
+      mutate(label=factor(recode(period, !!!key_a), levels=key_a)) %>%
       mutate(ord=recode(period, !!!key_b)) %>%
       mutate(date=lubridate::as_date(paste0("01-",month,"-",year),format="%d-%b-%Y")) %>%
       arrange(ord,date)
@@ -75,7 +75,7 @@ s4 <- s1 %>%
 ```{r}
 #| echo: false
 #| label: interest
-#| fig-cap: Skandia interest rates for home loan over time. Average rate per month is shown. Different lines (colours) denotes different periods of fixed rates (6 months, 1 year, 2 years, 3 years, 5 years).
+#| fig-cap: Skandia interest rates for home loan over time. Average rate per month is shown. Different lines (colours) denotes different periods of fixed rates (3 months, 1 year, 2 years, 3 years, 5 years).
 
 hchart(s,"line",hcaes(x=date,y=value,group=label)) %>%
   hc_xAxis(title=list(text="Date"),crosshair=TRUE) %>%
@@ -93,7 +93,7 @@ hchart(s,"line",hcaes(x=date,y=value,group=label)) %>%
 ```{r}
 #| echo: false
 #| label: interest-slope
-#| fig-cap: Change (Slope) in fixed interest rates per month. Slope is computed over 0.5 - 2 years (slope_2), 0.5 - 3 years (slope_3) or 0.5 - 5 years (slope_5).
+#| fig-cap: Change (Slope) in fixed interest rates per month. Slope is computed over 3 months - 2 years (slope_2), 3 months - 3 years (slope_3) or 3 months - 5 years (slope_5).
 
 hchart(s4,"line",hcaes(x=date,y=value,group=period)) %>%
   hc_xAxis(title=list(text="Date"),crosshair=TRUE) %>%
