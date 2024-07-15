@@ -23,52 +23,49 @@ key_a <- c(y0.5 = "3 months", y1 = "1 year", y2 = "2 years", y3 = "3 years", y5 
 key_b <- c(y0.5 = 1, y1 = 2, y2 = 3, y3 = 4, y5 = 5)
 
 s <- readxl::read_xlsx("skandia-interest.xlsx") %>%
-      tidyr::pivot_longer(`y0.5`:`y5`, names_to = "period", values_to = "value") %>%
-      mutate(label=factor(recode(period, !!!key_a), levels=key_a)) %>%
-      mutate(ord=recode(period, !!!key_b)) %>%
-      mutate(date=lubridate::as_date(paste0("01-",month,"-",year),format="%d-%b-%Y")) %>%
-      arrange(ord,date)
-
-s %>%
-  group_by(ord,date) %>%
-  summarise()
+  tidyr::pivot_longer(`y0.5`:`y5`, names_to = "period", values_to = "value") %>%
+  mutate(year = as.character(year)) %>%
+  mutate(label = factor(recode(period, !!!key_a), levels = key_a)) %>%
+  mutate(ord = recode(period, !!!key_b)) %>%
+  mutate(date = as_date(lubridate::dmy(paste0("28-", month, "-", year), tz = "Europe/Stockholm"))) %>%
+  arrange(ord, date)
 
 s1 <- s %>%
-  dplyr::select(-period,-label,-date) %>%
-  dplyr::group_by(year,month) %>%
+  dplyr::select(-period, -label, -date) %>%
+  dplyr::group_by(year, month) %>%
   tidyr::nest() %>%
-  mutate(slope_5=purrr::map(data,~coef(lm(value~ord, data=.x))[["ord"]])) %>%
+  mutate(slope_5 = purrr::map(data, ~ coef(lm(value ~ ord, data = .x))[["ord"]])) %>%
   select(-data) %>%
-  unnest(cols=slope_5) %>%
-  mutate(date=lubridate::as_date(paste0("01-",month,"-",year),format="%d-%b-%Y")) %>%
+  unnest(cols = slope_5) %>%
+  mutate(date = as_date(lubridate::dmy(paste0("28-", month, "-", year), tz = "Europe/Stockholm"))) %>%
   ungroup()
 
 s2 <- s %>%
-  filter(period!="y5") %>%
-  dplyr::select(-period,-label,-date) %>%
-  dplyr::group_by(year,month) %>%
+  filter(period != "y5") %>%
+  dplyr::select(-period, -label, -date) %>%
+  dplyr::group_by(year, month) %>%
   tidyr::nest() %>%
-  mutate(slope_3=purrr::map(data, ~coef(lm(value~ord, data=.x))[["ord"]])) %>%
+  mutate(slope_3 = purrr::map(data, ~ coef(lm(value ~ ord, data = .x))[["ord"]])) %>%
   select(-data) %>%
-  unnest(cols=slope_3) %>%
-  mutate(date=lubridate::as_date(paste0("01-",month,"-",year),format="%d-%b-%Y")) %>%
+  unnest(cols = slope_3) %>%
+  mutate(date = as_date(lubridate::dmy(paste0("28-", month, "-", year), tz = "Europe/Stockholm"))) %>%
   ungroup()
 
 s3 <- s %>%
-  filter(period!="y5" & period!="y3") %>%
-  dplyr::select(-period,-label,-date) %>%
-  dplyr::group_by(year,month) %>%
+  filter(period != "y5" & period != "y3") %>%
+  dplyr::select(-period, -label, -date) %>%
+  dplyr::group_by(year, month) %>%
   tidyr::nest() %>%
-  mutate(slope_2=purrr::map(data, ~coef(lm(value~ord, data=.x))[["ord"]])) %>%
+  mutate(slope_2 = purrr::map(data, ~ coef(lm(value ~ ord, data = .x))[["ord"]])) %>%
   select(-data) %>%
-  unnest(cols=slope_2) %>%
-  mutate(date=lubridate::as_date(paste0("01-",month,"-",year),format="%d-%b-%Y")) %>%
+  unnest(cols = slope_2) %>%
+  mutate(date = as_date(lubridate::dmy(paste0("28-", month, "-", year), tz = "Europe/Stockholm"))) %>%
   ungroup()
 
 s4 <- s1 %>%
-  inner_join(select(s2,date,slope_3),by="date") %>%
-  inner_join(select(s3,date,slope_2),by="date") %>%
-  tidyr::pivot_longer(c(slope_5,slope_3,slope_2), names_to = "period", values_to = "value") %>%
+  inner_join(select(s2, date, slope_3), by = "date") %>%
+  inner_join(select(s3, date, slope_2), by = "date") %>%
+  tidyr::pivot_longer(c(slope_5, slope_3, slope_2), names_to = "period", values_to = "value") %>%
   arrange(date)
 ```
 
