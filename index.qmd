@@ -105,21 +105,21 @@ hchart(s4,"line",hcaes(x=date,y=value,group=period)) %>%
 ```{r}
 #| echo: false
 #| label: interest-ratio
-#| fig-cap: Ratio of interest rate over time (1 year / 3 month, 2 year / 3 month, 3 year / 3 month and 5 year / 3 month ratios). Y axis value 1 can be considered as the reference (3 month rate) and other rates are relative to this.
+#| fig-cap: Fold change (Log2 Ratio) of fixed interest rates relative to variable interest rate over time (1 year / 3 month, 2 year / 3 month, 3 year / 3 month and 5 year / 3 month ratios). Y axis value 0 can be considered as the reference (3 month rate) and other rates are relative to this.
 
 s5 <- s %>%
   tidyr::pivot_wider(id_cols = c(date, year, month), names_from = "period", values_from = "value") %>%
   dplyr::arrange(date) %>%
-  mutate("5y3m" = round(y5 / y0.5, 3)) %>%
-  mutate("3y3m" = round(y3 / y0.5, 3)) %>%
-  mutate("2y3m" = round(y2 / y0.5, 3)) %>%
-  mutate("1y3m" = round(y1 / y0.5, 3)) %>%
+  mutate("5y3m" = round(log2(y5 / y0.5), 3)) %>%
+  mutate("3y3m" = round(log2(y3 / y0.5), 3)) %>%
+  mutate("2y3m" = round(log2(y2 / y0.5), 3)) %>%
+  mutate("1y3m" = round(log2(y1 / y0.5), 3)) %>%
   dplyr::select(date, `5y3m`, `3y3m`, `2y3m`, `1y3m`) %>%
   tidyr::pivot_longer(!date, names_to = "ratio", values_to = "value")
 
 hchart(s5, "line", hcaes(x = date, y = value, group = ratio)) %>%
   hc_xAxis(title = list(text = "Date"), crosshair = TRUE) %>%
-  hc_yAxis(title = list(text = "Ratio"), crosshair = TRUE) %>%
+  hc_yAxis(title = list(text = "Fold change (Log2 Ratio)"), crosshair = TRUE) %>%
   hc_chart(zoomType = "xy") %>%
   hc_plotOptions(scatter = list(marker = list(radius = 3), opacity = 0.8)) %>%
   hc_legend(enabled = TRUE, verticalAlign = "top", align = "right") %>%
