@@ -1,11 +1,12 @@
 ---
 title: "Mortgage Interest Rates"
 subtitle: "Skandia Bank"
+description: "Average interest rates for home loans from Skandia Bank over time."
 author: "Roy Francis"
 date: today
 date-format: "DD-MMM-YYYY"
 title-block-banner: true
-format: 
+format:
   html:
     page-layout: full
     self-contained: true
@@ -132,4 +133,3 @@ hchart(s5, "line", hcaes(x = date, y = value, group = ratio)) %>%
 ---
 
 [Source: Skandia](https://www.skandia.se/lana/bolan/bolanerantor/snittrantor/)
-
