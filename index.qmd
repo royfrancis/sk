@@ -73,40 +73,40 @@ s4 <- s1 %>%
 ```{r}
 #| echo: false
 #| label: interest
-#| fig-cap: Skandia interest rates for home loan over time. Average rate per month is shown. Different lines (colours) denotes different periods of fixed rates (3 months, 1 year, 2 years, 3 years, 5 years).
+#| fig-cap: "**Actual interest rates**: Skandia interest rates for home loan over time. Average rate per month is shown. Different lines (colours) denotes different periods of fixed rates (3 months, 1 year, 2 years, 3 years, 5 years)."
 
-hchart(s,"line",hcaes(x=date,y=value,group=label)) %>%
-  hc_xAxis(title=list(text="Date"),crosshair=TRUE) %>%
-  hc_yAxis(title=list(text="Interest rate %"),crosshair=TRUE) %>%
-  hc_chart(zoomType="xy") %>%
-  hc_plotOptions(scatter=list(marker=list(radius=3),opacity=0.8)) %>%
-  hc_legend(enabled=TRUE,verticalAlign="top",align="right") %>%
-  hc_size(height=500) %>%
-  #hc_title(text=title,align="left") %>%
-  hc_exporting(buttons=list(contextButton=list(enabled=TRUE)))
+hchart(s, "line", hcaes(x = date, y = value, group = label)) %>%
+  hc_xAxis(title = list(text = "Date"), crosshair = TRUE) %>%
+  hc_yAxis(title = list(text = "Interest rate %"), crosshair = TRUE) %>%
+  hc_chart(zoomType = "xy") %>%
+  hc_plotOptions(scatter = list(marker = list(radius = 3), opacity = 0.8)) %>%
+  hc_legend(enabled = TRUE, verticalAlign = "top", align = "right") %>%
+  hc_size(height = 500) %>%
+  # hc_title(text=title,align="left") %>%
+  hc_exporting(buttons = list(contextButton = list(enabled = TRUE)))
 ```
 
 ```{r}
 #| echo: false
 #| label: interest-slope
-#| fig-cap: Change (Slope) in fixed interest rates per month. Slope is computed over 3 months - 2 years (slope_2), 3 months - 3 years (slope_3) or 3 months - 5 years (slope_5).
+#| fig-cap: "**Rate of change**: Change (Slope) in fixed interest rates per month. Slope is computed over 3 months - 2 years (slope_2), 3 months - 3 years (slope_3) or 3 months - 5 years (slope_5)."
 
-hchart(s4,"line",hcaes(x=date,y=value,group=period)) %>%
-  hc_xAxis(title=list(text="Date"),crosshair=TRUE) %>%
-  hc_yAxis(title=list(text="Slope"),crosshair=TRUE) %>%
-  hc_chart(zoomType="xy") %>%
-  hc_plotOptions(scatter=list(marker=list(radius=3),opacity=0.8)) %>%
-  hc_legend(enabled=TRUE,verticalAlign="top",align="right") %>%
-  hc_size(height=450) %>%
-  #hc_title(text=title,align="left") %>%
+hchart(s4, "line", hcaes(x = date, y = value, group = period)) %>%
+  hc_xAxis(title = list(text = "Date"), crosshair = TRUE) %>%
+  hc_yAxis(title = list(text = "Slope"), crosshair = TRUE) %>%
+  hc_chart(zoomType = "xy") %>%
+  hc_plotOptions(scatter = list(marker = list(radius = 3), opacity = 0.8)) %>%
+  hc_legend(enabled = TRUE, verticalAlign = "top", align = "right") %>%
+  hc_size(height = 450) %>%
+  # hc_title(text=title,align="left") %>%
   hc_colors(c("#CA527D", "#8A81CA", "#70D451")) %>%
-  hc_exporting(buttons=list(contextButton=list(enabled=TRUE)))
+  hc_exporting(buttons = list(contextButton = list(enabled = TRUE)))
 ```
 
 ```{r}
 #| echo: false
 #| label: interest-ratio
-#| fig-cap: Fold change (Log2 Ratio) of fixed interest rates relative to variable interest rate over time (1 year / 3 month, 2 year / 3 month, 3 year / 3 month and 5 year / 3 month ratios). Y axis value 0 can be considered as the reference (3 month rate) and other rates are relative to this.
+#| fig-cap: "**Relative difference**: Fold change (Log2 Ratio) of fixed interest rates relative to variable interest rate over time (1 year / 3 month, 2 year / 3 month, 3 year / 3 month and 5 year / 3 month ratios). Y axis value 0 can be considered as the reference (3 month rate) and other rates are relative to this."
 
 s5 <- s %>%
   tidyr::pivot_wider(id_cols = c(date, year, month), names_from = "period", values_from = "value") %>%
