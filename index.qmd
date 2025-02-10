@@ -20,11 +20,11 @@ library(highcharter)
 library(tidyr)
 library(dplyr)
 
-key_a <- c(y0.5 = "3 months", y1 = "1 year", y2 = "2 years", y3 = "3 years", y5 = "5 years")
-key_b <- c(y0.5 = 1, y1 = 2, y2 = 3, y3 = 4, y5 = 5)
+key_a <- c(y0 = "3 months", y1 = "1 year", y2 = "2 years", y3 = "3 years", y5 = "5 years", cbpr = "CBPR", cblr = "CBLR")
+key_b <- c(y0 = 1, y1 = 2, y2 = 3, y3 = 4, y5 = 5, cbpr = 6, cblr = 7)
 
 s <- readxl::read_xlsx("skandia-interest.xlsx") %>%
-  tidyr::pivot_longer(`y0.5`:`y5`, names_to = "period", values_to = "value") %>%
+  tidyr::pivot_longer(`y0`:`cblr`, names_to = "period", values_to = "value") %>%
   mutate(year = as.character(year)) %>%
   mutate(label = factor(recode(period, !!!key_a), levels = key_a)) %>%
   mutate(ord = recode(period, !!!key_b)) %>%
@@ -32,6 +32,7 @@ s <- readxl::read_xlsx("skandia-interest.xlsx") %>%
   arrange(ord, date)
 
 s1 <- s %>%
+  dplyr::filter(period != "cbpr" & period != "cblr") %>%
   dplyr::select(-period, -label, -date) %>%
   dplyr::group_by(year, month) %>%
   tidyr::nest() %>%
@@ -42,7 +43,8 @@ s1 <- s %>%
   ungroup()
 
 s2 <- s %>%
-  filter(period != "y5") %>%
+  dplyr::filter(period != "cbpr" & period != "cblr") %>%
+  dplyr::filter(period != "y5") %>%
   dplyr::select(-period, -label, -date) %>%
   dplyr::group_by(year, month) %>%
   tidyr::nest() %>%
@@ -53,7 +55,8 @@ s2 <- s %>%
   ungroup()
 
 s3 <- s %>%
-  filter(period != "y5" & period != "y3") %>%
+  dplyr::filter(period != "cbpr" & period != "cblr") %>%
+  dplyr::filter(period != "y5" & period != "y3") %>%
   dplyr::select(-period, -label, -date) %>%
   dplyr::group_by(year, month) %>%
   tidyr::nest() %>%
@@ -72,8 +75,7 @@ s4 <- s1 %>%
 
 ```{r}
 #| echo: false
-#| label: interest
-#| fig-cap: "**Actual interest rates**: Skandia interest rates for home loan over time. Average rate per month is shown. Different lines (colours) denotes different periods of fixed rates (3 months, 1 year, 2 years, 3 years, 5 years)."
+#| fig-cap: "**Actual interest rates**: Skandia interest rates for home loan over time. Average rate per month is shown. Different lines (colours) denotes different periods of fixed rates (3 months, 1 year, 2 years, 3 years, 5 years). CBPR (Central Bank Policy Rate) and CBLR (Central Bank Lending Rate) are also shown."
 
 hchart(s, "line", hcaes(x = date, y = value, group = label)) %>%
   hc_xAxis(title = list(text = "Date"), crosshair = TRUE) %>%
@@ -88,7 +90,6 @@ hchart(s, "line", hcaes(x = date, y = value, group = label)) %>%
 
 ```{r}
 #| echo: false
-#| label: interest-slope
 #| fig-cap: "**Rate of change**: Change (Slope) in fixed interest rates per month. Slope is computed over 3 months - 2 years (slope_2), 3 months - 3 years (slope_3) or 3 months - 5 years (slope_5)."
 
 hchart(s4, "line", hcaes(x = date, y = value, group = period)) %>%
@@ -105,16 +106,15 @@ hchart(s4, "line", hcaes(x = date, y = value, group = period)) %>%
 
 ```{r}
 #| echo: false
-#| label: interest-ratio
 #| fig-cap: "**Relative difference**: Fold change (Log2 Ratio) of fixed interest rates relative to variable interest rate over time (1 year / 3 month, 2 year / 3 month, 3 year / 3 month and 5 year / 3 month ratios). Y axis value 0 can be considered as the reference (3 month rate) and other rates are relative to this."
 
 s5 <- s %>%
   tidyr::pivot_wider(id_cols = c(date, year, month), names_from = "period", values_from = "value") %>%
   dplyr::arrange(date) %>%
-  mutate("5y" = round(log2(y5 / y0.5), 3)) %>%
-  mutate("3y" = round(log2(y3 / y0.5), 3)) %>%
-  mutate("2y" = round(log2(y2 / y0.5), 3)) %>%
-  mutate("1y" = round(log2(y1 / y0.5), 3)) %>%
+  mutate("5y" = round(log2(y5 / y0), 3)) %>%
+  mutate("3y" = round(log2(y3 / y0), 3)) %>%
+  mutate("2y" = round(log2(y2 / y0), 3)) %>%
+  mutate("1y" = round(log2(y1 / y0), 3)) %>%
   dplyr::select(date, `5y`, `3y`, `2y`, `1y`) %>%
   tidyr::pivot_longer(!date, names_to = "ratio", values_to = "value")
 
@@ -132,4 +132,5 @@ hchart(s5, "line", hcaes(x = date, y = value, group = ratio)) %>%
 
 ---
 
-[Source: Skandia](https://www.skandia.se/lana/bolan/bolanerantor/snittrantor/)
+[Source: Skandia](https://www.skandia.se/lana/bolan/bolanerantor/snittrantor/)  
+[Source (CBPR, CBLR): Riksbank](https://www.riksbank.se/en-gb/statistics/interest-rates-and-exchange-rates/search-interest-rates-and-exchange-rates)
